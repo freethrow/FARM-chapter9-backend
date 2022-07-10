@@ -1,4 +1,3 @@
-from msilib.schema import Error
 from typing import List, Optional
 
 from fastapi import (
