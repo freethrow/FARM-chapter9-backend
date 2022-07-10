@@ -31,3 +31,4 @@ requests
 uvicorn
 virtualenv
 virtualenv-clone
+msilib
