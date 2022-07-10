@@ -1,0 +1,10 @@
+dnspython
+fastapi
+motor
+PythonDNS
+uvicorn
+python-decouple
+bcrypt
+bson
+email-validator
+
