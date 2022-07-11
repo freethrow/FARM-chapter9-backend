@@ -15,7 +15,7 @@ DB_NAME = config("DB_NAME", cast=str)
 
 # define origins
 origins = [
-    "http://127.0.0.1:3000",
+    "*",
 ]
 
 # instantiate the app
@@ -25,7 +25,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    # allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
