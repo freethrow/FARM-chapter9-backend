@@ -127,8 +127,15 @@ async def create_car_form(
     created_car = await request.app.mongodb["cars"].find_one(
         {"_id": new_car.inserted_id}
     )
+    headers = {
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "*",
+    }
 
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_car)
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED, content=created_car, headers=headers
+    )
 
 
 # get car by ID
