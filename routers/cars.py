@@ -174,17 +174,20 @@ async def delete_task(
 ):
 
     # check if the car is owned by the user trying to delete it
-    findCar = await request.app.mongodb["cars"].find_one({"_id": id})
+    try:
+        findCar = await request.app.mongodb["cars"].find_one({"_id": id})
+        if findCar["owner"] != userId:
+            raise HTTPException(
+                status_code=401, detail="Only the owner can delete the car"
+            )
 
-    if findCar["owner"] != userId:
-        raise HTTPException(status_code=401, detail="Only the owner can delete the car")
+        delete_result = await request.app.mongodb["cars"].delete_one({"_id": id})
 
-    delete_result = await request.app.mongodb["cars"].delete_one({"_id": id})
+        if delete_result.deleted_count == 1:
+            return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content={})
 
-    if delete_result.deleted_count == 1:
-        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
-
-    raise HTTPException(status_code=404, detail=f"Car with {id} not found")
+    except TypeError:
+        raise HTTPException(status_code=404, detail=f"Car with {id} not found")
 
 
 # optional
