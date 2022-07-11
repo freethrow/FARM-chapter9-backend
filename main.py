@@ -14,7 +14,7 @@ DB_NAME = config("DB_NAME", cast=str)
 
 
 # define origins
-origins = ["http://localhost/", "http://127.0.0.1:3000"]
+origins = ["*"]
 
 # instantiate the app
 app = FastAPI()
