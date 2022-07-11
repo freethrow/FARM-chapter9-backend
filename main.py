@@ -14,7 +14,7 @@ DB_NAME = config("DB_NAME", cast=str)
 
 
 # define origins
-origins = ["vercel.app"]
+origins = ["*"]
 
 # instantiate the app
 app = FastAPI()
@@ -23,7 +23,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    # allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
