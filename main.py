@@ -5,7 +5,6 @@ from fastapi import FastAPI
 # from fastapi.middleware.cors import CORSMiddleware
 
 from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware import Middleware
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -25,14 +24,17 @@ origins = [
 # instantiate the app
 app = FastAPI()
 
+app.include_router(cars_router, prefix="/cars", tags=["cars"])
+app.include_router(users_router, prefix="/users", tags=["users"])
+
 # add CORS middleware
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     # allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    # allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
@@ -44,16 +46,3 @@ async def startup_db_client():
 @app.on_event("shutdown")
 async def shutdown_db_client():
     app.mongodb_client.close()
-
-
-app.include_router(cars_router, prefix="/cars", tags=["cars"])
-app.include_router(users_router, prefix="/users", tags=["users"])
-
-origins = ["*"]
-app = CORSMiddleware(
-    app=app,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
