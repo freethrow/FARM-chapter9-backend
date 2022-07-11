@@ -14,7 +14,7 @@ DB_NAME = config("DB_NAME", cast=str)
 
 
 # define origins
-origins = ["https://farmstack-chapter8-frontend-9luh12dv2-freethrow.vercel.app/"]
+origins = ["*.vercel.app"]
 
 # instantiate the app
 app = FastAPI()
