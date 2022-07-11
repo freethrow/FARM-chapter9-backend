@@ -2,9 +2,19 @@ from decouple import config
 
 from fastapi import FastAPI
 
-# from fastapi.middleware.cors import CORSMiddleware
-
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
+
+
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+]
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -22,19 +32,19 @@ origins = [
 ]
 
 # instantiate the app
-app = FastAPI()
+app = FastAPI(middleware=middleware)
 
 app.include_router(cars_router, prefix="/cars", tags=["cars"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 
 # add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    # allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     # allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 
 @app.on_event("startup")
