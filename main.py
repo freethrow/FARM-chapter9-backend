@@ -14,7 +14,7 @@ DB_NAME = config("DB_NAME", cast=str)
 
 
 # define origins
-origins = ["*"]
+origins = ["vercel.app"]
 
 # instantiate the app
 app = FastAPI()
