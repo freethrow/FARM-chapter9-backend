@@ -14,11 +14,7 @@ DB_NAME = config("DB_NAME", cast=str)
 
 
 # define origins
-origins = [
-    "https://farmstack-chapter8-frontend-7uld7cftl-freethrow.vercel.app",
-    "http://127.0.0.1:3000",
-    "https://127.0.0.1:3000",
-]
+origins = ["*"]
 
 # instantiate the app
 app = FastAPI()
@@ -27,7 +23,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    # allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
