@@ -1,18 +1,18 @@
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
+
 from typing import List, Optional
 
-from fastapi import (
-    APIRouter,
-    Request,
-    Body,
-    status,
-    HTTPException,
-)
+from fastapi import APIRouter, Request, Body, HTTPException, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+
 
 from decouple import config
 
 from models import CarBase
+
+from utils.report import report_pipeline
 
 
 router = APIRouter()
@@ -47,12 +47,30 @@ async def list_all_cars(
     return results
 
 
-# get car by ID
-@router.get("/{id}", response_description="Get a single car")
-async def show_car(id: str, request: Request):
-    if (car := await request.app.mongodb["cars"].find_one({"_id": id})) is not None:
-        return CarBase(**car)
-    raise HTTPException(status_code=404, detail=f"Car with {id} not found")
+# sample of N cars
+@router.get("/sample/{n}", response_description="Sample of N cars")
+async def get_sample(n: int, request: Request):
+
+    query = [
+        {"$match": {"year": {"$gt": 2010}}},
+        {
+            "$project": {
+                "_id": 0,
+                "km": 1,
+                "year": 1,
+                "make": 1,
+                "price": 1,
+                "cm3": 1,
+                "brand": 1,
+            }
+        },
+        {"$sample": {"size": n}},
+        {"$sort": {"brand": 1, "make": 1, "year": 1}},
+    ]
+
+    full_query = request.app.mongodb["cars"].aggregate(query)
+    results = [el async for el in full_query]
+    return results
 
 
 # aggregation by model / avg price
@@ -100,8 +118,7 @@ async def brand_count(request: Request):
     query = [{"$group": {"_id": "$brand", "count": {"$sum": 1}}}]
 
     full_query = request.app.mongodb["cars"].aggregate(query)
-    results = [el async for el in full_query]
-    return results
+    return [el async for el in full_query]
 
 
 # count cars by make
@@ -117,3 +134,24 @@ async def brand_count(brand: str, request: Request):
     full_query = request.app.mongodb["cars"].aggregate(query)
     results = [el async for el in full_query]
     return results
+
+
+# get car by ID
+@router.get("/{id}", response_description="Get a single car")
+async def show_car(id: str, request: Request):
+    if (car := await request.app.mongodb["cars"].find_one({"_id": id})) is not None:
+        return CarBase(**car)
+    raise HTTPException(status_code=404, detail=f"Car with {id} not found")
+
+
+@router.post("/email", response_description="Send email")
+async def send_mail(
+    background_tasks: BackgroundTasks,
+    cars_num: int = Body(...),
+    email: str = Body(...),
+):
+    print(email, cars_num)
+    print("Sending report in the background")
+    background_tasks.add_task(report_pipeline, email, cars_num)
+
+    return {"Received": {"email": email, "cars_num": cars_num}}

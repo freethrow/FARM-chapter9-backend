@@ -1,5 +1,4 @@
 from decouple import config
-
 from fastapi import FastAPI
 
 
@@ -48,10 +47,10 @@ async def startup_db_client():
     app.mongodb = app.mongodb_client[DB_NAME]
 
 
-@app.on_event("startup")
-@repeat_every(seconds=10)
-def repeated_tasks() -> None:
-    print("Repeating...")
+# @app.on_event("startup")
+# @repeat_every(seconds=10)
+# def repeated_tasks() -> None:
+#     print("Repeating...")
 
 
 @app.on_event("shutdown")
