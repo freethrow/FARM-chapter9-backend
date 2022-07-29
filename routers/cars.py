@@ -1,3 +1,4 @@
+from math import ceil
 import sendgrid
 import os
 from sendgrid.helpers.mail import *
@@ -34,6 +35,11 @@ async def list_all_cars(
     if brand:
         query["brand"] = brand
 
+    # count total docs
+    pages = ceil(
+        await request.app.mongodb["cars"].count_documents(query) / RESULTS_PER_PAGE
+    )
+
     full_query = (
         request.app.mongodb["cars"]
         .find(query)
@@ -44,7 +50,7 @@ async def list_all_cars(
 
     results = [CarBase(**raw_car) async for raw_car in full_query]
 
-    return results
+    return {"results": results, "pages": pages}
 
 
 # sample of N cars
