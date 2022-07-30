@@ -1,38 +1,29 @@
 from .report_query import make_query
-from .create_report import create_report
+
 from .send_report import send_report
 from .complex_charts import draw_treemap
 from uuid import uuid4
 
 
 def report_pipeline(email, cars_number):
-    report_name = "Report" + str(uuid4())[:5] + ".docx"
 
-    # make the query
+    # make the query - get the data and some HTML
     try:
-        results = make_query(cars_number)
+        query_data = make_query(cars_number)
     except Exception as e:
         print(e)
         print("Couldn't make the query")
 
     # create the chart
     try:
-        chart_name = draw_treemap(results)
+        chart_html = draw_treemap(query_data["results"])
 
     except Exception as e:
         print(e)
         print("Couldn't draw chart")
 
-    # create the report
     try:
-        report = create_report(username="Marko", cars=results, report_name=report_name)
+        send_report(email=email, HTMLcontent=query_data["HTML"])
 
     except Exception as e:
         print(e)
-        print("Couldn't create report")
-
-    # try:
-    #     send_report(email, report_name)
-
-    # except Exception as e:
-    #     print(e)

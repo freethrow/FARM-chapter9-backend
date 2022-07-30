@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 # draw treemap and save it
-def draw_treemap(data, filename="latest.png"):
+def draw_treemap(data, filename="tree.html"):
 
     cwd = Path.cwd()
 
@@ -26,14 +26,12 @@ def draw_treemap(data, filename="latest.png"):
         hover_data=["avg_km"],
         color_continuous_scale="RdBu_r",
     )
-    ## store multiple lists of data in customdata
-    avg_price = df.avg_price.tolist()
-    avg_km = df.avg_km.tolist()
 
     fig.update_layout(margin=dict(t=2, l=2, r=2, b=2))
     try:
         image_path = Path.joinpath(cwd, "utils", "charts", filename)
-        fig.write_image(image_path)
+        # fig.write_image(image_path)
+        fig.write_html(image_path)
         print("Written image file ", filename)
     except Exception as e:
         print(e)

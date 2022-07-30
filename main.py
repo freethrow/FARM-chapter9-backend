@@ -1,5 +1,6 @@
 from decouple import config
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 
 # there seems to be a bug with FastAPI's middleware
@@ -39,6 +40,8 @@ origins = [
 app = FastAPI(middleware=middleware)
 
 app.include_router(cars_router, prefix="/cars", tags=["cars"])
+
+app.mount("/static", StaticFiles(directory="utils/charts"), name="static")
 
 
 @app.on_event("startup")

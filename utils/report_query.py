@@ -2,6 +2,7 @@
 from pymongo import MongoClient
 from decouple import config
 
+import pandas as pd
 
 # connect to mongodb
 DB_URL = config("DB_URL", cast=str)
@@ -12,19 +13,13 @@ db = client[DB_NAME]
 cars = db["cars"]
 
 
-def make_query(cars_number):
+def make_query(cars_number: int):
 
     query = [
         {"$match": {"year": {"$gt": 2010}}},
         {
             "$project": {
                 "_id": 0,
-                "km": 1,
-                "year": 1,
-                "make": 1,
-                "price": 1,
-                "cm3": 1,
-                "brand": 1,
             }
         },
         {"$sample": {"size": cars_number}},
@@ -32,4 +27,7 @@ def make_query(cars_number):
     ]
 
     full_query = cars.aggregate(query)
-    return [el for el in full_query]
+    results = [el for el in full_query]
+
+    HTML = pd.DataFrame(results).to_html()
+    return {"results": results, "HTML": HTML}

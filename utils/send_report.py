@@ -7,7 +7,10 @@ from sendgrid.helpers.mail import *
 
 import base64
 
-from sendgrid import SendGridAPIClient
+from .renderEmail import render_template
+
+
+# from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Mail,
     Attachment,
@@ -20,9 +23,10 @@ from sendgrid.helpers.mail import (
 SENDGRID_ID = config("SENDGRID_ID", cast=str)
 
 
-def send_report(email, file_name):
+def send_report(email, HTMLcontent):
 
-    print("Starting mail with:", email, file_name)
+    fromTpl = render_template(title="Car Report for DATE", body=HTMLcontent)
+    print("FROM TPL:", fromTpl)
     sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_ID)
     from_email = Email("FARM@freethrow.rs")
     to_email = To(email)
@@ -30,11 +34,12 @@ def send_report(email, file_name):
     content = Content(
         "text/plain", "this is dynamic text, potentially coming from our database"
     )
-    mail = Mail(from_email, to_email, subject, content)
+    # html_content = fromTpl
+    mail = Mail(from_email, to_email, subject, content, html_content=fromTpl)
 
     cwd = Path.cwd()
 
-    filepath = Path.joinpath(cwd, "utils", "reports", file_name)
+    filepath = Path.joinpath(cwd, "utils", "charts", "tree.html")
     print("Email path:", filepath)
 
     try:
@@ -42,12 +47,12 @@ def send_report(email, file_name):
         with open(filepath, "rb") as f:
             data = f.read()
             f.close()
-        encoded_file = base64.b64encode(data).decode()
+            encoded_file = base64.b64encode(data).decode()
 
         attachedFile = Attachment(
             FileContent(encoded_file),
-            FileName(file_name),
-            FileType("application/docx"),
+            FileName("ReportMap.html"),
+            FileType("text/html"),
             Disposition("attachment"),
         )
         mail.attachment = attachedFile
