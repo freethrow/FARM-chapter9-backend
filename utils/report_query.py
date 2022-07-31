@@ -29,5 +29,6 @@ def make_query(cars_number: int):
     full_query = cars.aggregate(query)
     results = [el for el in full_query]
 
-    HTML = pd.DataFrame(results).to_html()
-    return {"results": results, "HTML": HTML}
+    HTML = pd.DataFrame(results).to_html(index=False)
+
+    return HTML

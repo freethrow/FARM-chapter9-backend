@@ -1,15 +1,11 @@
 from decouple import config
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-
 
 # there seems to be a bug with FastAPI's middleware
 # https://stackoverflow.com/questions/65191061/fastapi-cors-middleware-not-working-with-get-method/65994876#65994876
 
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-
-from fastapi_utils.tasks import repeat_every
 
 
 middleware = [
@@ -41,19 +37,11 @@ app = FastAPI(middleware=middleware)
 
 app.include_router(cars_router, prefix="/cars", tags=["cars"])
 
-app.mount("/static", StaticFiles(directory="utils/charts"), name="static")
-
 
 @app.on_event("startup")
 async def startup_db_client():
     app.mongodb_client = AsyncIOMotorClient(DB_URL)
     app.mongodb = app.mongodb_client[DB_NAME]
-
-
-# @app.on_event("startup")
-# @repeat_every(seconds=10)
-# def repeated_tasks() -> None:
-#     print("Repeating...")
 
 
 @app.on_event("shutdown")

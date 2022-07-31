@@ -1,15 +1,10 @@
 from math import ceil
-import sendgrid
-import os
-from sendgrid.helpers.mail import *
 
 from typing import List, Optional
 
 from fastapi import APIRouter, Request, Body, HTTPException, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 
-
-from decouple import config
 
 from models import CarBase
 
@@ -71,44 +66,6 @@ async def get_sample(n: int, request: Request):
     full_query = request.app.mongodb["cars"].aggregate(query)
     results = [el async for el in full_query]
     return results
-
-
-# # aggregation by model / avg price
-# @router.get("/brand/price/{brand}", response_description="Get brand models by price")
-# async def brand_price(brand: str, request: Request):
-
-#     query = [
-#         {"$match": {"brand": brand}},
-#         {"$project": {"_id": 0, "price": 1, "year": 1, "make": 1}},
-#         {
-#             "$group": {"_id": {"model": "$make"}, "avgPrice": {"$avg": "$price"}},
-#         },
-#         {"$sort": {"avgPrice": 1}},
-#     ]
-
-#     full_query = request.app.mongodb["cars"].aggregate(query)
-#     results = [el async for el in full_query]
-#     return results
-
-
-# # add aggregations here 1-2 at least
-
-# # aggregation by model / avg km
-# @router.get("/brand/km/{brand}", response_description="Get brand models by km")
-# async def brand_km(brand: str, request: Request):
-
-#     query = [
-#         {"$match": {"brand": brand}},
-#         {"$project": {"_id": 0, "km": 1, "year": 1, "make": 1}},
-#         {
-#             "$group": {"_id": {"model": "$make"}, "avgKm": {"$avg": "$km"}},
-#         },
-#         {"$sort": {"avgKm": 1}},
-#     ]
-
-#     full_query = request.app.mongodb["cars"].aggregate(query)
-#     results = [el async for el in full_query]
-#     return results
 
 
 # aggregation by model / avg price
